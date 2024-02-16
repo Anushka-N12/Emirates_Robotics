@@ -1,0 +1,6 @@
+ultralytics
+flask
+cv2
+json
+numpy
+requests
