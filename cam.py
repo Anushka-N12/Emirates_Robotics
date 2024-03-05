@@ -34,29 +34,40 @@ def set_awb(url: str, awb: int=1):
         print("SET_QUALITY: something went wrong")
     return awb
 
+def check_cam_connection(url: str, timeout=5):
+    try:
+        response = requests.get(url + ":81/stream", timeout=timeout)
+        return response.status_code == 200
+    except:
+        return False
+
 # Function used by app.py to get image
 def getimg(url):
-    cap = cv2.VideoCapture(url + ":81/stream")
-    set_resolution(url, index=8)
-    n,x = 0,[]
-    if True:
-        try:
-            if cap.isOpened():
-                cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
-                ret, frame = cap.read()
-                if ret:
-                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                    gray = cv2.equalizeHist(gray)
-                n += 1
-                cv2.imwrite("frame.jpg", frame)  
-                # frame.set(5,640)
-                # frame.set(6,480)
-        except:
-            pass
+    stat = check_cam_connection(url)
+    if stat:
+        cap = cv2.VideoCapture(url + ":81/stream")
+        set_resolution(url, index=8)
+        n,x = 0,[]
+        if True:
+            try:
+                if cap.isOpened():
+                    cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
+                    ret, frame = cap.read()
+                    if ret:
+                        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                        gray = cv2.equalizeHist(gray)
+                    n += 1
+                    cv2.imwrite("frame.jpg", frame)  
+                    # frame.set(5,640)
+                    # frame.set(6,480)
+            except:
+                pass
 
-    # cv2.destroyAllWindows()
-    cap.release()
-    return 'Image saved.'
+        # cv2.destroyAllWindows()
+        cap.release()
+        return 1
+    else:
+        return 0
 
 # Test to execute only if this file is executed directly
 if __name__ == '__main__':
